@@ -3,7 +3,7 @@
     "name": "Codepad",
     "short_name": "Codepad",
     "description": "A very basic implementation of a text editor (using advanced editing features of Monaco editor)",
-    "start_url": "/",
+    "start_url": "/codepad/",
     "background_color": "#2f3d58",
     "theme_color": "#2f3d58",
     "orientation": "any",
