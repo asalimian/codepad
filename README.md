@@ -11,6 +11,7 @@ This may be installed as a PWA so that it can be used without an internet connec
 * Edit Mode - A single editor pane
 * Compare Mode - Splits the editor into two, so that lines may be compared
 * Language Selection - Syntax highlighting from some popular coding languages
+* Word Wrap - For those text files that don't respect your horizontal space.
 * Dark Mode - Invert the color scheme
 
 # Issues & Feature Requests 
