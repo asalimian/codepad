@@ -22,13 +22,79 @@
             color:white;
         }
         
+		button {
+			height:25px;
+		}
+		select {
+			height:25px;
+		}
+		.options {
+			float:right
+		}
+
+		/* The switch - the box around the slider */
+		.switch {
+		position: relative;
+		display: inline-block;
+		width: 52px;
+		height: 25px;
+		bottom:3px;
+		}
+
+		/* Hide default HTML checkbox */
+		.switch input {
+		opacity: 0;
+		width: 0;
+		height: 0;
+		}
+
+		/* The slider */
+		.slider {
+		position: absolute;
+		cursor: pointer;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background-color: #ccc;
+		-webkit-transition: .04s;
+		transition: .04s;
+		}
+
+		.slider:before {
+		position: absolute;
+		content: "";
+		height: 17px;
+		width: 17px;
+		left: 4px;
+		bottom: 4px;
+		background-color: white;
+		-webkit-transition: .04s;
+		transition: .04s;
+		}
+
+		input:checked + .slider {
+		background-color: #ccc;
+		}
+
+		input:checked + .slider:before {
+		-webkit-transform: translateX(26px);
+		-ms-transform: translateX(26px);
+		transform: translateX(26px);
+		}
+
     </style>
 </head>
 
 <body>
     <button onclick="saveFile()">💾</button>
     <button onclick="openFile()">📂</button>
-    <button onclick="editMode()">Editor Mode</button>
+    
+	<button onclick="editMode()">Editor Mode</button>
+	<label class="switch">
+		<input type="checkbox" id="toggle" onclick="toggleMode(this)">
+		<span class="slider"></span>
+	</label>
     <button onclick="diffMode()">Compare Mode</button>
     <select name="language" id="language" onchange="setLang(this)">
         <option value="css">CSS</option>
@@ -36,17 +102,33 @@
         <option value="java">Java</option>
         <option value="javascript">Javascript</option>
         <option value="json">JSON</option>
-        <option value="markdown">Markdown</option>
+        <option value="markdown" selected>Markdown</option>
         <option value="python">Python</option>
         <option value="text">Text</option>
     </select>
-    <button onclick="toggleTheme()" id="themeToggle" style="float:right;">🌞 → 🌚</button>
+    <button onclick="toggleTheme(this)" id="themeToggle" class="options">🌞 → 🌚</button>
+	<button onclick="toggleWrap(this)" class="options"><span style='font-family:"Segoe UI Emoji"'>↔️</span> Unwrap</button>
 
     <div id="container" style="border:0px solid grey"></div>
 
     <script src="monaco-editor/min/vs/loader.js"></script>
     <script>
-        var text = ['function x() {', '\tconsole.log("Hello world!");', '}'].join('\n');
+        var text = atob('IyBjb2RlcGFkClRoaXMgaXMgYSBzaW1wbGUgd2ViIGJhc2VkIHRleHQgZWRpdG9yIHRoYXQgaXMg' +
+					'bGlrZSBhIG1hc2h1cCBvZiBXaW5kb3cncyBub3RlcGFkIGFuZCBWaXN1YWwgU3R1ZGlvIENvZGUu'+
+					'IAoKVGhpcyBicmluZ3MgYWR2YW5jZWQgdGV4dCBlZGl0aW5nIHRvb2xzIGxpa2UgbXVsdGktbGlu'+
+					'ZSBlZGl0aW5nLCByZWdleCBzZWFyY2gsIGNvZGUgZm9sZGluZywgdmFyaWFibGUgc3VnZ2VzdGlv'+
+					'biB0byB5b3UuIFdoaWxlIGluIHRoZSBlZGl0b3IsIEYxIHdpbGwgYWN0aXZhdGUgdGhlIENvbW1h'+
+					'bmQgUGFsZXR0ZS4KClRoaXMgbWF5IGJlIGluc3RhbGxlZCBhcyBhIFBXQSBzbyB0aGF0IGl0IGNh'+
+					'biBiZSB1c2VkIHdpdGhvdXQgYW4gaW50ZXJuZXQgY29ubmVjdGlvbi4KCiMgRmVhdHVyZXMKKiBT'+
+					'YXZlIC0gU2F2ZSBhbnkgdGV4dCB5b3UgaGF2ZSB0byB5b3VyIGRpc2suCiogT3BlbiAtIE9wZW4g'+
+					'YSB0ZXh0IGZpbGUgZnJvbSBkaXNrLgoqIEVkaXQgTW9kZSAtIEEgc2luZ2xlIGVkaXRvciBwYW5l'+
+					'CiogQ29tcGFyZSBNb2RlIC0gU3BsaXRzIHRoZSBlZGl0b3IgaW50byB0d28sIHNvIHRoYXQgbGlu'+
+					'ZXMgbWF5IGJlIGNvbXBhcmVkCiogTGFuZ3VhZ2UgU2VsZWN0aW9uIC0gU3ludGF4IGhpZ2hsaWdo'+
+					'dGluZyBmcm9tIHNvbWUgcG9wdWxhciBjb2RpbmcgbGFuZ3VhZ2VzCiogRGFyayBNb2RlIC0gSW52'+
+					'ZXJ0IHRoZSBjb2xvciBzY2hlbWUKCiMgSXNzdWVzICYgRmVhdHVyZSBSZXF1ZXN0cyAKSWYgeW91'+
+					'IGZpbmQgYW55dGhpbmcgd2VpcmQgc2VuZCBpdCB0byB0aGUgcmVwbydzIGlzc3VlIHBhZ2UuIGh0'+
+					'dHBzOi8vZ2l0aHViLmNvbS9hc2FsaW1pYW4vY29kZXBhZC9pc3N1ZXM=');
+					
         require.config({
             paths: {
                 vs: 'monaco-editor/min/vs'
@@ -55,27 +137,45 @@
         require(['vs/editor/editor.main'], function () {
             var editor = monaco.editor.create(document.getElementById('container'), {
                 value: text,
-                language: userLanguage
+                language: userLanguage,
+				wordWrap: userWrap
             });
         });
 
-        var userLanguage = 'javascript';
+        var userLanguage = 'markdown';
+		var userWrap = 'on';
+		var lightTheme = true;
 
         var editor
 
         function setLang(lang) {
             userLanguage = lang.value;
-            if (monaco.editor.getDiffEditors().length == 0) {
-                normalMode()
+			redrawEditors();
+        }
+		
+		function redrawEditors() {
+			if (monaco.editor.getDiffEditors().length == 0) {
+                editMode()
             } else {
                 diffMode()
             }
-        }
-        var lightTheme = true;
-        function toggleTheme() {
+		}
+
+		function toggleWrap(e) {
+			if (userWrap=='on') {
+				userWrap = 'off';
+				e.innerHTML = '↩️ Wrap';
+			} else {
+				userWrap='on';
+				e.innerHTML = '<span style=\'font-family:"Segoe UI Emoji"\'>↔️</span> Unwrap';
+			}
+			redrawEditors();
+		}
+
+        function toggleTheme(e) {
             if (lightTheme) {
                 monaco.editor.setTheme('vs-dark');
-                document.getElementById('themeToggle').innerHTML = '🌚 → 🌞'
+                e.innerHTML = '🌚 → 🌞'
                 lightTheme = false;
 
                 var element = document.body;
@@ -87,7 +187,7 @@
                 });
             } else {
                 monaco.editor.setTheme('vs');
-                document.getElementById('themeToggle').innerHTML = '🌞 → 🌚'
+                e.innerHTML = '🌞 → 🌚'
                 lightTheme = true;
                 var element = document.body;
                 element.classList.toggle("dark-mode");
@@ -141,18 +241,28 @@
             }
         }
 
-        function editMode() {
+		function toggleMode(e) {
+			if (e.checked) {
+				diffMode();
+			} else {
+				editMode();
+			}
+		}
 
+        function editMode() {
+			document.getElementById('toggle').checked=false;
             clearEditors()
 
             require(['vs/editor/editor.main'], function () {
                 var editor = monaco.editor.create(document.getElementById('container'), {
                     value: text,
-                    language: userLanguage
+                    language: userLanguage,
+					wordWrap: userWrap
                 });
             });
         }
         function diffMode() {
+			document.getElementById('toggle').checked=true;
             try {
                 oldEditor = monaco.editor.getEditors()[0]
                 text = oldEditor.getValue()
@@ -165,10 +275,11 @@
             var originalModel = monaco.editor.createModel(text, userLanguage);
             var modifiedModel = monaco.editor.createModel(text, userLanguage);
             var diffEditor = monaco.editor.createDiffEditor(document.getElementById("container"), {
-                originalEditable: true, // for left pane
+				originalEditable: true, // for left pane
                 readOnly: false, // for right pane
             });
             diffEditor.setModel({ original: originalModel, modified: modifiedModel });
+			diffEditor.updateOptions({ wordWrap: userWrap });
         }
 
 
@@ -191,8 +302,6 @@
             // get file contents
             const fileData = await fileHandle.getFile();
             const fileText = await fileData.text();
-            console.log(fileData)
-            console.log(fileText)
             setEditors(fileText);
         }
 
