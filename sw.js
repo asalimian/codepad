@@ -1,4 +1,4 @@
-const CACHE_NAME = 'codepad-v1.2.1';
+const CACHE_NAME = 'codepad-v1.2.2';
 
 // Use the install event to pre-cache all initial resources.
 self.addEventListener('install', event => {

@@ -8,7 +8,7 @@
     "theme_color": "#2f3d58",
     "orientation": "any",
     "display": "standalone",
-    "version": "1.2.1",
+    "version": "1.2.2",
     "icons": [
         {
             "src": "codepad.png",

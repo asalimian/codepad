@@ -5,6 +5,7 @@
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <meta name="viewport" content="width=device-width">
     <style>
         body {
             height: 100vh;
@@ -86,7 +87,7 @@
     </style>
 </head>
 
-<body>
+<body onresize="redrawEditors()">
 	<button onclick="openFile()">📂</button>
     <button onclick="saveFile()">💾</button>
     
@@ -252,6 +253,13 @@
 
         function editMode() {
 			document.getElementById('toggle').checked=false;
+            try {
+                oldEditor = monaco.editor.getEditors()[0]
+                text = oldEditor.getValue()
+            } catch (error) {
+                oldEditor = monaco.editor.getDiffEditors()[0]
+                text = oldEditor.getModifiedEditor().getValue();
+            }
             clearEditors()
 
             require(['vs/editor/editor.main'], function () {
