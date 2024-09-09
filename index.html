@@ -6,7 +6,37 @@
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
     <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <style>
+        .material-symbols-rounded {
+          font-variation-settings:
+          'FILL' 0,
+          'wght' 300,
+          'GRAD' 0,
+          'opsz' 40;
+          cursor: pointer;
+          vertical-align:middle;
+          font-size: 28px
+        }
+        .material-symbols-rounded:hover {
+            background-color: lightgreen;
+            border-radius: 50px;
+            cursor: pointer;
+            content:"wrap"
+            }
+        .material-symbols-rounded.wrap::before{
+            content:"wrap_text"; 
+            
+        }
+        
+        .material-symbols-rounded.wrap:hover::before{
+            content:"subject"; 
+        }
+        </style>
+    <style>
+        button {
+            cursor: pointer;
+        }
         body {
             height: 100vh;
             padding: 0;
@@ -28,6 +58,7 @@
 		}
 		select {
 			height:25px;
+            cursor: pointer;
 		}
 		.options {
 			float:right
@@ -88,16 +119,17 @@
 </head>
 
 <body onresize="redrawEditors()">
-	<button onclick="openFile()">📂</button>
-    <button onclick="saveFile()">💾</button>
+    <span title="New page" onclick="clearEditors();editMode();" class="material-symbols-rounded">note_add</span>
+    <span title="Open file" onclick="openFile()" class="material-symbols-rounded">file_open</span>
+    <span title="Save As" onclick="saveFile()" class="material-symbols-rounded">file_save</span>
     
 	<button onclick="editMode()">Editor Mode</button>
 	<label class="switch">
-		<input type="checkbox" id="toggle" onclick="toggleMode(this)">
+        <input type="checkbox" id="toggle" onclick="toggleMode(this)">
 		<span class="slider"></span>
 	</label>
     <button onclick="diffMode()">Compare Mode</button>
-    <select name="language" id="language" onchange="setLang(this)">
+    <select id="syntax" title="Syntax Highlight" class="options" name="language" id="language" onchange="setLang(this)">
         <option value="css">CSS</option>
         <option value="html">HTML</option>
         <option value="java">Java</option>
@@ -107,30 +139,37 @@
         <option value="python">Python</option>
         <option value="text">Text</option>
     </select>
-    <button onclick="toggleTheme(this)" id="themeToggle" class="options">🌞 → 🌚</button>
-	<button onclick="toggleWrap(this)" class="options"><span style='font-family:"Segoe UI Emoji"'>↔️</span> Unwrap</button>
+    
+    
+    <span title="Toggle Theme" onclick="toggleTheme(this)" class="material-symbols-rounded options">light_mode</span>
+    <span title="Toggle Wrap" onclick="toggleWrap(this)" class="material-symbols-rounded options wrap"></span>
 
     <div id="container" style="border:0px solid grey"></div>
 
     <script src="monaco-editor/min/vs/loader.js"></script>
     <script>
-        var text = atob('IyBjb2RlcGFkClRoaXMgaXMgYSBzaW1wbGUgd2ViIGJhc2VkIHRleHQgZWRpdG9yIHRoYXQgaXMg' +
-					'bGlrZSBhIG1hc2h1cCBvZiBXaW5kb3cncyBub3RlcGFkIGFuZCBWaXN1YWwgU3R1ZGlvIENvZGUu'+
-					'IAoKVGhpcyBicmluZ3MgYWR2YW5jZWQgdGV4dCBlZGl0aW5nIHRvb2xzIGxpa2UgbXVsdGktbGlu'+
-					'ZSBlZGl0aW5nLCByZWdleCBzZWFyY2gsIGNvZGUgZm9sZGluZywgdmFyaWFibGUgc3VnZ2VzdGlv'+
-					'biB0byB5b3UuIFdoaWxlIGluIHRoZSBlZGl0b3IsIEYxIHdpbGwgYWN0aXZhdGUgdGhlIENvbW1h'+
-					'bmQgUGFsZXR0ZS4KClRoaXMgbWF5IGJlIGluc3RhbGxlZCBhcyBhIFBXQSBzbyB0aGF0IGl0IGNh'+
-					'biBiZSB1c2VkIHdpdGhvdXQgYW4gaW50ZXJuZXQgY29ubmVjdGlvbi4KCiMgRmVhdHVyZXMKKiBT'+
-					'YXZlIC0gU2F2ZSBhbnkgdGV4dCB5b3UgaGF2ZSB0byB5b3VyIGRpc2suCiogT3BlbiAtIE9wZW4g'+
-					'YSB0ZXh0IGZpbGUgZnJvbSBkaXNrLgoqIEVkaXQgTW9kZSAtIEEgc2luZ2xlIGVkaXRvciBwYW5l'+
-					'CiogQ29tcGFyZSBNb2RlIC0gU3BsaXRzIHRoZSBlZGl0b3IgaW50byB0d28sIHNvIHRoYXQgbGlu'+
-					'ZXMgbWF5IGJlIGNvbXBhcmVkCiogTGFuZ3VhZ2UgU2VsZWN0aW9uIC0gU3ludGF4IGhpZ2hsaWdo'+
-					'dGluZyBmcm9tIHNvbWUgcG9wdWxhciBjb2RpbmcgbGFuZ3VhZ2VzCiogV29yZCBXcmFwIC0gRm9y'+
-					'IHRob3NlIHRleHQgZmlsZXMgdGhhdCBkb24ndCByZXNwZWN0IHlvdXIgaG9yaXpvbnRhbCBzcGFj'+
-					'ZS4KKiBEYXJrIE1vZGUgLSBJbnZlcnQgdGhlIGNvbG9yIHNjaGVtZQoKIyBJc3N1ZXMgJiBGZWF0'+
-					'dXJlIFJlcXVlc3RzIApJZiB5b3UgZmluZCBhbnl0aGluZyB3ZWlyZCBzZW5kIGl0IHRvIHRoZSBy'+
-					'ZXBvJ3MgaXNzdWUgcGFnZS4gaHR0cHM6Ly9naXRodWIuY29tL2FzYWxpbWlhbi9jb2RlcGFkL2lz'+
-					'c3Vlcw==');
+var default_text = `# Codepad
+This is a simple web based text editor that is like a mashup of Window's notepad and Visual Studio Code. 
+
+This brings advanced text editing tools like multi-line editing, regex search, code folding, variable suggestion to you. While in the editor, F1 will activate the Command Palette.
+
+This may be installed as a PWA so that it can be used without an internet connection.
+
+# Features
+* No Autosaving - Restart from default text every time!
+* Open - Open a text file from disk.
+* Save As - Save any text you have to your disk.
+* Edit Mode - A single editor pane
+* Compare Mode - Splits the editor into two, so that lines may be compared
+* Word Wrap - For those text files that don't respect your horizontal space.
+* Dark Mode - Invert the color scheme
+* Language Selection - Syntax highlighting from some popular coding languages
+
+\`\`\` rust
+// Use a markdown code block for other languages
+\`\`\`
+
+# Issues & Feature Requests \nIf you find any bugs, log it to the [issue page](https://github.com/asalimian/codepad/issues).`;
         require.config({
             paths: {
                 vs: 'monaco-editor/min/vs'
@@ -138,7 +177,7 @@
         });
         require(['vs/editor/editor.main'], function () {
             var editor = monaco.editor.create(document.getElementById('container'), {
-                value: text,
+                value: default_text,
                 language: userLanguage,
 				wordWrap: userWrap
             });
@@ -166,10 +205,8 @@
 		function toggleWrap(e) {
 			if (userWrap=='on') {
 				userWrap = 'off';
-				e.innerHTML = '↩️ Wrap';
 			} else {
-				userWrap='on';
-				e.innerHTML = '<span style=\'font-family:"Segoe UI Emoji"\'>↔️</span> Unwrap';
+                userWrap='on';
 			}
 			redrawEditors();
 		}
@@ -177,28 +214,21 @@
         function toggleTheme(e) {
             if (lightTheme) {
                 monaco.editor.setTheme('vs-dark');
-                e.innerHTML = '🌚 → 🌞'
+                e.innerHTML = 'dark_mode'
                 lightTheme = false;
-
-                var element = document.body;
-                element.classList.toggle("dark-mode");
-                const buttons = document.querySelectorAll('button');
-
-                buttons.forEach(button => {
-                button.classList.toggle('dark-mode');
-                });
             } else {
                 monaco.editor.setTheme('vs');
-                e.innerHTML = '🌞 → 🌚'
+                e.innerHTML = 'light_mode'
                 lightTheme = true;
-                var element = document.body;
-                element.classList.toggle("dark-mode");
-                const buttons = document.querySelectorAll('button');
-
-                buttons.forEach(button => {
-                button.classList.toggle('dark-mode');
-                });
             }
+            var element = document.body;
+            element.classList.toggle("dark-mode");
+            const buttons = document.querySelectorAll('button');
+
+            buttons.forEach(button => {
+                button.classList.toggle('dark-mode');
+            });
+            document.getElementById('syntax').classList.toggle('dark-mode');
         }
         function setEditors(textstream) {
             try {
@@ -250,21 +280,29 @@
 				editMode();
 			}
 		}
+ 
 
+        function extractText(value, index, array) {
+            return value.getValue();
+        }
         function editMode() {
 			document.getElementById('toggle').checked=false;
             try {
-                oldEditor = monaco.editor.getEditors()[0]
-                text = oldEditor.getValue()
-            } catch (error) {
                 oldEditor = monaco.editor.getDiffEditors()[0]
-                text = oldEditor.getModifiedEditor().getValue();
+                if (diff) { 
+                    default_text = oldEditor.getModifiedEditor().getValue();
+                } else {
+                    oldEditor = monaco.editor.getEditors()[0]
+                    default_text = oldEditor.getValue()
+                }
+            } catch (error) {
+                default_text = default_text
             }
             clearEditors()
 
             require(['vs/editor/editor.main'], function () {
                 var editor = monaco.editor.create(document.getElementById('container'), {
-                    value: text,
+                    value: default_text,
                     language: userLanguage,
 					wordWrap: userWrap
                 });
@@ -273,16 +311,21 @@
         function diffMode() {
 			document.getElementById('toggle').checked=true;
             try {
-                oldEditor = monaco.editor.getEditors()[0]
-                text = oldEditor.getValue()
-            } catch (error) {
                 oldEditor = monaco.editor.getDiffEditors()[0]
-                text = oldEditor.getModifiedEditor().getValue();
+                default_text = oldEditor.getOriginalEditor().getValue();
+                modtext = oldEditor.getModifiedEditor().getValue();
+                method = "new"
+            } catch (error) {
+                oldEditor = monaco.editor.getEditors()[0]
+                default_text = oldEditor.getValue()
+                modtext = default_text
+                method = "old"
             }
+            console.log(method)
             oldEditor.dispose()
             clearEditors()
-            var originalModel = monaco.editor.createModel(text, userLanguage);
-            var modifiedModel = monaco.editor.createModel(text, userLanguage);
+            var originalModel = monaco.editor.createModel(default_text, userLanguage);
+            var modifiedModel = monaco.editor.createModel(modtext, userLanguage);
             var diffEditor = monaco.editor.createDiffEditor(document.getElementById("container"), {
 				originalEditable: true, // for left pane
                 readOnly: false, // for right pane
