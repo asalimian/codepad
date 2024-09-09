@@ -6,37 +6,41 @@
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
     <meta name="viewport" content="width=device-width">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <style>
         .material-symbols-rounded {
-          font-variation-settings:
-          'FILL' 0,
-          'wght' 300,
-          'GRAD' 0,
-          'opsz' 40;
-          cursor: pointer;
-          vertical-align:middle;
-          font-size: 28px
+            font-variation-settings:
+                'FILL' 0,
+                'wght' 300,
+                'GRAD' 0,
+                'opsz' 40;
+            cursor: pointer;
+            vertical-align: middle;
+            font-size: 28px
         }
+
         .material-symbols-rounded:hover {
             background-color: lightgreen;
             border-radius: 50px;
             cursor: pointer;
-            content:"wrap"
-            }
-        .material-symbols-rounded.wrap::before{
-            content:"wrap_text"; 
-            
+            content: "wrap"
         }
-        
-        .material-symbols-rounded.wrap:hover::before{
-            content:"subject"; 
+
+        .material-symbols-rounded.wrap::before {
+            content: "wrap_text";
+
         }
-        </style>
+
+        .material-symbols-rounded.wrap:hover::before {
+            content: "subject";
+        }
+    </style>
     <style>
         button {
             cursor: pointer;
         }
+
         body {
             height: 100vh;
             padding: 0;
@@ -48,73 +52,75 @@
             height: 90vh;
             padding: 0;
         }
+
         .dark-mode {
             background-color: black;
-            color:white;
+            color: white;
         }
-        
-		button {
-			height:25px;
-		}
-		select {
-			height:25px;
+
+        button {
+            height: 25px;
+        }
+
+        select {
+            height: 25px;
             cursor: pointer;
-		}
-		.options {
-			float:right
-		}
+        }
 
-		/* The switch - the box around the slider */
-		.switch {
-		position: relative;
-		display: inline-block;
-		width: 52px;
-		height: 25px;
-		bottom:3px;
-		}
+        .options {
+            float: right
+        }
 
-		/* Hide default HTML checkbox */
-		.switch input {
-		opacity: 0;
-		width: 0;
-		height: 0;
-		}
+        /* The switch - the box around the slider */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 52px;
+            height: 25px;
+            bottom: 3px;
+        }
 
-		/* The slider */
-		.slider {
-		position: absolute;
-		cursor: pointer;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		background-color: #ccc;
-		-webkit-transition: .04s;
-		transition: .04s;
-		}
+        /* Hide default HTML checkbox */
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
 
-		.slider:before {
-		position: absolute;
-		content: "";
-		height: 17px;
-		width: 17px;
-		left: 4px;
-		bottom: 4px;
-		background-color: white;
-		-webkit-transition: .04s;
-		transition: .04s;
-		}
+        /* The slider */
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            -webkit-transition: .04s;
+            transition: .04s;
+        }
 
-		input:checked + .slider {
-		background-color: #ccc;
-		}
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 17px;
+            width: 17px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            -webkit-transition: .04s;
+            transition: .04s;
+        }
 
-		input:checked + .slider:before {
-		-webkit-transform: translateX(26px);
-		-ms-transform: translateX(26px);
-		transform: translateX(26px);
-		}
+        input:checked+.slider {
+            background-color: #ccc;
+        }
 
+        input:checked+.slider:before {
+            -webkit-transform: translateX(26px);
+            -ms-transform: translateX(26px);
+            transform: translateX(26px);
+        }
     </style>
 </head>
 
@@ -122,12 +128,12 @@
     <span title="New page" onclick="clearEditors();editMode();" class="material-symbols-rounded">note_add</span>
     <span title="Open file" onclick="openFile()" class="material-symbols-rounded">file_open</span>
     <span title="Save As" onclick="saveFile()" class="material-symbols-rounded">file_save</span>
-    
-	<button onclick="editMode()">Editor Mode</button>
-	<label class="switch">
+
+    <button onclick="editMode()">Editor Mode</button>
+    <label class="switch">
         <input type="checkbox" id="toggle" onclick="toggleMode(this)">
-		<span class="slider"></span>
-	</label>
+        <span class="slider"></span>
+    </label>
     <button onclick="diffMode()">Compare Mode</button>
     <select id="syntax" title="Syntax Highlight" class="options" name="language" id="language" onchange="setLang(this)">
         <option value="css">CSS</option>
@@ -139,8 +145,8 @@
         <option value="python">Python</option>
         <option value="text">Text</option>
     </select>
-    
-    
+
+
     <span title="Toggle Theme" onclick="toggleTheme(this)" class="material-symbols-rounded options">light_mode</span>
     <span title="Toggle Wrap" onclick="toggleWrap(this)" class="material-symbols-rounded options wrap"></span>
 
@@ -148,7 +154,7 @@
 
     <script src="monaco-editor/min/vs/loader.js"></script>
     <script>
-var default_text = `# Codepad
+        var default_text = `# Codepad
 This is a simple web based text editor that is like a mashup of Window's notepad and Visual Studio Code. 
 
 This brings advanced text editing tools like multi-line editing, regex search, code folding, variable suggestion to you. While in the editor, F1 will activate the Command Palette.
@@ -179,37 +185,37 @@ This may be installed as a PWA so that it can be used without an internet connec
             var editor = monaco.editor.create(document.getElementById('container'), {
                 value: default_text,
                 language: userLanguage,
-				wordWrap: userWrap
+                wordWrap: userWrap
             });
         });
 
         var userLanguage = 'markdown';
-		var userWrap = 'on';
-		var lightTheme = true;
+        var userWrap = 'on';
+        var lightTheme = true;
 
         var editor
 
         function setLang(lang) {
             userLanguage = lang.value;
-			redrawEditors();
+            redrawEditors();
         }
-		
-		function redrawEditors() {
-			if (monaco.editor.getDiffEditors().length == 0) {
+
+        function redrawEditors() {
+            if (monaco.editor.getDiffEditors().length == 0) {
                 editMode()
             } else {
                 diffMode()
             }
-		}
+        }
 
-		function toggleWrap(e) {
-			if (userWrap=='on') {
-				userWrap = 'off';
-			} else {
-                userWrap='on';
-			}
-			redrawEditors();
-		}
+        function toggleWrap(e) {
+            if (userWrap == 'on') {
+                userWrap = 'off';
+            } else {
+                userWrap = 'on';
+            }
+            redrawEditors();
+        }
 
         function toggleTheme(e) {
             if (lightTheme) {
@@ -273,23 +279,23 @@ This may be installed as a PWA so that it can be used without an internet connec
             }
         }
 
-		function toggleMode(e) {
-			if (e.checked) {
-				diffMode();
-			} else {
-				editMode();
-			}
-		}
- 
+        function toggleMode(e) {
+            if (e.checked) {
+                diffMode();
+            } else {
+                editMode();
+            }
+        }
+
 
         function extractText(value, index, array) {
             return value.getValue();
         }
         function editMode() {
-			document.getElementById('toggle').checked=false;
+            document.getElementById('toggle').checked = false;
             try {
                 oldEditor = monaco.editor.getDiffEditors()[0]
-                if (diff) { 
+                if (diff) {
                     default_text = oldEditor.getModifiedEditor().getValue();
                 } else {
                     oldEditor = monaco.editor.getEditors()[0]
@@ -304,12 +310,12 @@ This may be installed as a PWA so that it can be used without an internet connec
                 var editor = monaco.editor.create(document.getElementById('container'), {
                     value: default_text,
                     language: userLanguage,
-					wordWrap: userWrap
+                    wordWrap: userWrap
                 });
             });
         }
         function diffMode() {
-			document.getElementById('toggle').checked=true;
+            document.getElementById('toggle').checked = true;
             try {
                 oldEditor = monaco.editor.getDiffEditors()[0]
                 default_text = oldEditor.getOriginalEditor().getValue();
@@ -327,11 +333,11 @@ This may be installed as a PWA so that it can be used without an internet connec
             var originalModel = monaco.editor.createModel(default_text, userLanguage);
             var modifiedModel = monaco.editor.createModel(modtext, userLanguage);
             var diffEditor = monaco.editor.createDiffEditor(document.getElementById("container"), {
-				originalEditable: true, // for left pane
+                originalEditable: true, // for left pane
                 readOnly: false, // for right pane
             });
             diffEditor.setModel({ original: originalModel, modified: modifiedModel });
-			diffEditor.updateOptions({ wordWrap: userWrap });
+            diffEditor.updateOptions({ wordWrap: userWrap });
         }
 
 
@@ -360,10 +366,10 @@ This may be installed as a PWA so that it can be used without an internet connec
         async function saveFile() { // create a new handle
             const opts = {
                 types: [
-                {
-                    description: "Text file",
-                    accept: { "text/plain": [".txt"] },
-                },
+                    {
+                        description: "Text file",
+                        accept: { "text/plain": [".txt"] },
+                    },
                 ],
             };
             const newHandle = await window.showSaveFilePicker(opts);
