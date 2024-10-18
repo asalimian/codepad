@@ -294,9 +294,20 @@ This may be installed as a PWA so that it can be used without an internet connec
         function editMode() {
             document.getElementById('toggle').checked = false;
             try {
-                oldEditor = monaco.editor.getDiffEditors()[0]
-                if (diff) {
-                    default_text = oldEditor.getModifiedEditor().getValue();
+                if (monaco.editor.getDiffEditors().length>0) {
+                    oldEditor = monaco.editor.getDiffEditors()[0]
+                    
+                    oe = oldEditor.getOriginalEditor().getValue()
+                    me = oldEditor.getModifiedEditor().getValue()
+                    if (oe==me) {
+                        default_text += oldEditor.getOriginalEditor().getValue()    
+                    } else { 
+                        default_text = "<<<<<<< HEAD\r"
+                        default_text += oldEditor.getOriginalEditor().getValue()
+                        default_text += "\r=======\r"
+                        default_text += oldEditor.getModifiedEditor().getValue();
+                        default_text += "\r>>>>>>>"
+                    }
                 } else {
                     oldEditor = monaco.editor.getEditors()[0]
                     default_text = oldEditor.getValue()
@@ -324,7 +335,15 @@ This may be installed as a PWA so that it can be used without an internet connec
             } catch (error) {
                 oldEditor = monaco.editor.getEditors()[0]
                 default_text = oldEditor.getValue()
-                modtext = default_text
+                if (default_text.substring(0,13)=="<<<<<<< HEAD\r"){
+                    editor_text=default_text.replace("<<<<<<< HEAD\r",'')
+                    editor_text=editor_text.replace(">>>>>>>",'')
+                    editor_texts = editor_text.split("=======\r")
+                    default_text = editor_texts[0].trim()
+                    modtext = editor_texts[1].trim()
+                } else {
+                    modtext = default_text
+                }
                 method = "old"
             }
             console.log(method)
