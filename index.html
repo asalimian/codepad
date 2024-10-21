@@ -17,7 +17,8 @@
                 'opsz' 40;
             cursor: pointer;
             vertical-align: middle;
-            font-size: 28px
+            font-size: 28px;
+            width:28px;
         }
 
         .material-symbols-rounded:hover {
@@ -302,11 +303,11 @@ This may be installed as a PWA so that it can be used without an internet connec
                     if (oe==me) {
                         default_text += oldEditor.getOriginalEditor().getValue()    
                     } else { 
-                        default_text = "<<<<<<< HEAD\r"
+                        default_text = "<<<<<<< HEAD\n"
                         default_text += oldEditor.getOriginalEditor().getValue()
-                        default_text += "\r=======\r"
+                        default_text += "\n=======\n"
                         default_text += oldEditor.getModifiedEditor().getValue();
-                        default_text += "\r>>>>>>>"
+                        default_text += "\n>>>>>>>"
                     }
                 } else {
                     oldEditor = monaco.editor.getEditors()[0]
@@ -335,10 +336,10 @@ This may be installed as a PWA so that it can be used without an internet connec
             } catch (error) {
                 oldEditor = monaco.editor.getEditors()[0]
                 default_text = oldEditor.getValue()
-                if (default_text.substring(0,13)=="<<<<<<< HEAD\r"){
-                    editor_text=default_text.replace("<<<<<<< HEAD\r",'')
+                if (default_text.substring(0,13)=="<<<<<<< HEAD\n"){
+                    editor_text=default_text.replace("<<<<<<< HEAD\n",'')
                     editor_text=editor_text.replace(">>>>>>>",'')
-                    editor_texts = editor_text.split("=======\r")
+                    editor_texts = editor_text.split("=======\n")
                     default_text = editor_texts[0].trim()
                     modtext = editor_texts[1].trim()
                 } else {
