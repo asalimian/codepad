@@ -1,16 +1,16 @@
-const CACHE_NAME = 'codepad-v1.2.5';
+const CACHE_NAME = "codepad-v1.3.0";
 
 // Use the install event to pre-cache all initial resources.
-self.addEventListener('install', event => {
+self.addEventListener("install", (event) => {
   event.waitUntil((async () => {
     const cache = await caches.open(CACHE_NAME);
     cache.addAll([
-      '/codepad/'
+      "/codepad/",
     ]);
   })());
 });
 
-self.addEventListener('fetch', event => {
+self.addEventListener("fetch", (event) => {
   event.respondWith((async () => {
     const cache = await caches.open(CACHE_NAME);
 
@@ -19,16 +19,16 @@ self.addEventListener('fetch', event => {
     if (cachedResponse) {
       return cachedResponse;
     } else {
-        try {
-          // If the resource was not in the cache, try the network.
-          const fetchResponse = await fetch(event.request);
+      try {
+        // If the resource was not in the cache, try the network.
+        const fetchResponse = await fetch(event.request);
 
-          // Save the resource in the cache and return it.
-          cache.put(event.request, fetchResponse.clone());
-          return fetchResponse;
-        } catch (e) {
-          // The network failed.
-        }
+        // Save the resource in the cache and return it.
+        cache.put(event.request, fetchResponse.clone());
+        return fetchResponse;
+      } catch (e) {
+        // The network failed.
+      }
     }
   })());
 });

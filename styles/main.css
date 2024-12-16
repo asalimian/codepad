@@ -1,0 +1,197 @@
+/* main.css - Core application styles */
+:root {
+  --primary-bg: #ffffff;
+  --primary-text: #000000;
+  --toolbar-bg: #f5f5f5;
+  --toolbar-border: #e0e0e0;
+  --button-bg: #ffffff;
+  --button-hover: #f0f0f0;
+  --switch-bg: #ccc;
+  --switch-active: #4caf50;
+}
+
+/* Base styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100vh;
+  overflow: hidden;
+}
+
+body {
+  background-color: var(--primary-bg);
+  color: var(--primary-text);
+  font-family: system-ui, -apple-system, sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Layout */
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px;
+  background-color: var(--toolbar-bg);
+  border-bottom: 1px solid var(--toolbar-border);
+  height: 50px;
+}
+
+.toolbar-left,
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+#container {
+  height: calc(100vh - 50px);
+  width: 100%;
+}
+
+/* Controls */
+button {
+  padding: 4px 12px;
+  height: 32px;
+  background-color: var(--button-bg);
+  color: var(--button-text);
+  border: 1px solid var(--toolbar-border);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+button:hover {
+  background-color: var(--button-hover);
+}
+
+select {
+  height: 32px;
+  padding: 4px 8px;
+  border: 1px solid var(--toolbar-border);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  background-color: var(--button-bg);
+  color: var(--button-text);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Switch Component */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 52px;
+  height: 28px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--switch-bg);
+  transition: 0.3s;
+  border-radius: 28px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: 0.3s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: var(--switch-active);
+}
+
+input:checked + .slider:before {
+  transform: translateX(24px);
+}
+
+/* Dark Mode */
+body.dark-mode {
+  --primary-bg: #1e1e1e;
+  --primary-text: #ffffff;
+  --toolbar-bg: #2d2d2d;
+  --toolbar-border: #404040;
+  --button-bg: #3d3d3d;
+  --button-text: #ffffff;
+  --button-hover: #4d4d4d;
+  --switch-bg: #666;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .toolbar {
+    flex-direction: column;
+    height: auto;
+    padding: 8px;
+    gap: 8px;
+  }
+
+  .toolbar-left,
+  .toolbar-right {
+    width: 100%;
+    justify-content: center;
+  }
+
+  #container {
+    height: calc(100vh - 100px);
+  }
+}
+
+/* Utility Classes */
+.hidden {
+  display: none;
+}
+
+.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+
+
+#container {
+  position: relative;
+}
+
+#container.drag-active::after {
+  content: 'Drop file to open';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  z-index: 1000;
+}
+
+/* Dark mode adjustment */
+body.dark-mode #container.drag-active::after {
+  background: rgba(255, 255, 255, 0.2);
+}

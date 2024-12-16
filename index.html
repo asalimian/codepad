@@ -1,414 +1,83 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Codepad - Web-based Text Editor</title>
 
-<head>
+    <!-- Progressive Web App -->
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/x-icon" href="favicon.ico">
-    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-    <meta name="viewport" content="width=device-width">
-    <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-    <style>
-        .material-symbols-rounded {
-            font-variation-settings:
-                'FILL' 0,
-                'wght' 300,
-                'GRAD' 0,
-                'opsz' 40;
-            cursor: pointer;
-            vertical-align: middle;
-            font-size: 28px;
-            width:28px;
-        }
 
-        .material-symbols-rounded:hover {
-            background-color: lightgreen;
-            border-radius: 50px;
-            cursor: pointer;
-            content: "wrap"
-        }
+    <!-- External Resources -->
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+    >
+    <script src="monaco-editor/min/vs/loader.js" defer></script>
 
-        .material-symbols-rounded.wrap::before {
-            content: "wrap_text";
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles/icons.css">
+    <link rel="stylesheet" href="styles/main.css">
+  </head>
 
-        }
+  <body>
+    <!-- Toolbar -->
+    <header class="toolbar">
+      <div class="toolbar-left">
+        <span title="New page" id="newPage" class="material-symbols-rounded"
+        >note_add</span>
+        <span title="Open file" id="openFile" class="material-symbols-rounded"
+        >file_open</span>
+        <span title="Save As" id="saveFile" class="material-symbols-rounded"
+        >file_save</span>
 
-        .material-symbols-rounded.wrap:hover::before {
-            content: "subject";
-        }
-    </style>
-    <style>
-        button {
-            cursor: pointer;
-        }
+        <button id="editModeBtn">Editor Mode</button>
+        <label class="switch">
+          <input type="checkbox" id="toggle">
+          <span class="slider"></span>
+        </label>
+        <button id="compareModeBtn">Compare Mode</button>
+      </div>
 
-        body {
-            height: 100vh;
-            padding: 0;
-            margin: 0;
-        }
+      <div class="toolbar-right">
+        <select id="syntax" title="Syntax Highlight" class="options">
+          <option value="css">CSS</option>
+          <option value="html">HTML</option>
+          <option value="java">Java</option>
+          <option value="javascript">Javascript</option>
+          <option value="json">JSON</option>
+          <option value="markdown" selected>Markdown</option>
+          <option value="python">Python</option>
+          <option value="text">Text</option>
+        </select>
 
-        #container {
-            width: 100%;
-            height: 90vh;
-            padding: 0;
-        }
+        <span
+          title="Toggle Theme"
+          id="themeToggle"
+          class="material-symbols-rounded"
+        >light_mode</span>
+        <span
+          title="Toggle Wrap"
+          id="wrapToggle"
+          class="material-symbols-rounded"
+        >wrap_text</span>
+      </div>
+    </header>
 
-        .dark-mode {
-            background-color: black;
-            color: white;
-        }
+    <!-- Editor Container -->
+    <main id="container"></main>
 
-        button {
-            height: 25px;
-        }
-
-        select {
-            height: 25px;
-            cursor: pointer;
-        }
-
-        .options {
-            float: right
-        }
-
-        /* The switch - the box around the slider */
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 52px;
-            height: 25px;
-            bottom: 3px;
-        }
-
-        /* Hide default HTML checkbox */
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        /* The slider */
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            -webkit-transition: .04s;
-            transition: .04s;
-        }
-
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 17px;
-            width: 17px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            -webkit-transition: .04s;
-            transition: .04s;
-        }
-
-        input:checked+.slider {
-            background-color: #ccc;
-        }
-
-        input:checked+.slider:before {
-            -webkit-transform: translateX(26px);
-            -ms-transform: translateX(26px);
-            transform: translateX(26px);
-        }
-    </style>
-</head>
-
-<body onresize="redrawEditors()">
-    <span title="New page" onclick="clearEditors();editMode();" class="material-symbols-rounded">note_add</span>
-    <span title="Open file" onclick="openFile()" class="material-symbols-rounded">file_open</span>
-    <span title="Save As" onclick="saveFile()" class="material-symbols-rounded">file_save</span>
-
-    <button onclick="editMode()">Editor Mode</button>
-    <label class="switch">
-        <input type="checkbox" id="toggle" onclick="toggleMode(this)">
-        <span class="slider"></span>
-    </label>
-    <button onclick="diffMode()">Compare Mode</button>
-    <select id="syntax" title="Syntax Highlight" class="options" name="language" id="language" onchange="setLang(this)">
-        <option value="css">CSS</option>
-        <option value="html">HTML</option>
-        <option value="java">Java</option>
-        <option value="javascript">Javascript</option>
-        <option value="json">JSON</option>
-        <option value="markdown" selected>Markdown</option>
-        <option value="python">Python</option>
-        <option value="text">Text</option>
-    </select>
-
-
-    <span title="Toggle Theme" onclick="toggleTheme(this)" class="material-symbols-rounded options">light_mode</span>
-    <span title="Toggle Wrap" onclick="toggleWrap(this)" class="material-symbols-rounded options wrap"></span>
-
-    <div id="container" style="border:0px solid grey"></div>
-
-    <script src="monaco-editor/min/vs/loader.js"></script>
+    <!-- Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/editor.js"></script>
+    <script src="js/file-handlers.js"></script>
+    <script src="js/ui-controls.js"></script>
     <script>
-        var default_text = `# Codepad
-This is a simple web based text editor that is like a mashup of Window's notepad and Visual Studio Code. 
-
-This brings advanced text editing tools like multi-line editing, regex search, code folding, variable suggestion to you. While in the editor, F1 will activate the Command Palette.
-
-This may be installed as a PWA so that it can be used without an internet connection.
-
-# Features
-* No Autosaving - Restart from default text every time!
-* Open - Open a text file from disk.
-* Save As - Save any text you have to your disk.
-* Edit Mode - A single editor pane
-* Compare Mode - Splits the editor into two, so that lines may be compared
-* Word Wrap - For those text files that don't respect your horizontal space.
-* Dark Mode - Invert the color scheme
-* Language Selection - Syntax highlighting from some popular coding languages
-
-\`\`\` rust
-// Use a markdown code block for other languages
-\`\`\`
-
-# Issues & Feature Requests \nIf you find any bugs, log it to the [issue page](https://github.com/asalimian/codepad/issues).`;
-        require.config({
-            paths: {
-                vs: 'monaco-editor/min/vs'
-            }
-        });
-        require(['vs/editor/editor.main'], function () {
-            var editor = monaco.editor.create(document.getElementById('container'), {
-                value: default_text,
-                language: userLanguage,
-                wordWrap: userWrap
-            });
-        });
-
-        var userLanguage = 'markdown';
-        var userWrap = 'on';
-        var lightTheme = true;
-
-        var editor
-
-        function setLang(lang) {
-            userLanguage = lang.value;
-            redrawEditors();
-        }
-
-        function redrawEditors() {
-            if (monaco.editor.getDiffEditors().length == 0) {
-                editMode()
-            } else {
-                diffMode()
-            }
-        }
-
-        function toggleWrap(e) {
-            if (userWrap == 'on') {
-                userWrap = 'off';
-            } else {
-                userWrap = 'on';
-            }
-            redrawEditors();
-        }
-
-        function toggleTheme(e) {
-            if (lightTheme) {
-                monaco.editor.setTheme('vs-dark');
-                e.innerHTML = 'dark_mode'
-                lightTheme = false;
-            } else {
-                monaco.editor.setTheme('vs');
-                e.innerHTML = 'light_mode'
-                lightTheme = true;
-            }
-            var element = document.body;
-            element.classList.toggle("dark-mode");
-            const buttons = document.querySelectorAll('button');
-
-            buttons.forEach(button => {
-                button.classList.toggle('dark-mode');
-            });
-            document.getElementById('syntax').classList.toggle('dark-mode');
-        }
-        function setEditors(textstream) {
-            try {
-                for (e of monaco.editor.getDiffEditors()) {
-                    e.getOriginalEditor().setValue(textstream)
-                    e.getModifiedEditor().setValue(textstream)
-                }
-                for (e of monaco.editor.getEditors()) {
-                    e.setValue(textstream)
-                }
-            } catch (error) {
-                console.log(error)
-            }
-        }
-        function getEditors() {
-            var textstream
-            try {
-                try {
-                    oldEditor = monaco.editor.getDiffEditors()[0]
-                    textstream = oldEditor.getModifiedEditor().getValue();
-                } catch (error) {
-                    oldEditor = monaco.editor.getEditors()[0]
-                    textstream = oldEditor.getValue()
-                }
-                return textstream
-            } catch (error) {
-                console.log(error)
-            }
-        }
-
-        function clearEditors() {
-            try {
-
-                for (e of monaco.editor.getDiffEditors()) {
-                    e.dispose()
-                }
-                for (e of monaco.editor.getEditors()) {
-                    e.dispose()
-                }
-            } catch (error) {
-                console.log(error)
-            }
-        }
-
-        function toggleMode(e) {
-            if (e.checked) {
-                diffMode();
-            } else {
-                editMode();
-            }
-        }
-
-
-        function extractText(value, index, array) {
-            return value.getValue();
-        }
-        function editMode() {
-            document.getElementById('toggle').checked = false;
-            try {
-                if (monaco.editor.getDiffEditors().length>0) {
-                    oldEditor = monaco.editor.getDiffEditors()[0]
-                    
-                    oe = oldEditor.getOriginalEditor().getValue()
-                    me = oldEditor.getModifiedEditor().getValue()
-                    if (oe==me) {
-                        default_text += oldEditor.getOriginalEditor().getValue()    
-                    } else { 
-                        default_text = "<<<<<<< HEAD\n"
-                        default_text += oldEditor.getOriginalEditor().getValue()
-                        default_text += "\n=======\n"
-                        default_text += oldEditor.getModifiedEditor().getValue();
-                        default_text += "\n>>>>>>>"
-                    }
-                } else {
-                    oldEditor = monaco.editor.getEditors()[0]
-                    default_text = oldEditor.getValue()
-                }
-            } catch (error) {
-                default_text = default_text
-            }
-            clearEditors()
-
-            require(['vs/editor/editor.main'], function () {
-                var editor = monaco.editor.create(document.getElementById('container'), {
-                    value: default_text,
-                    language: userLanguage,
-                    wordWrap: userWrap
-                });
-            });
-        }
-        function diffMode() {
-            document.getElementById('toggle').checked = true;
-            try {
-                oldEditor = monaco.editor.getDiffEditors()[0]
-                default_text = oldEditor.getOriginalEditor().getValue();
-                modtext = oldEditor.getModifiedEditor().getValue();
-                method = "new"
-            } catch (error) {
-                oldEditor = monaco.editor.getEditors()[0]
-                default_text = oldEditor.getValue()
-                if (default_text.substring(0,13)=="<<<<<<< HEAD\n"){
-                    editor_text=default_text.replace("<<<<<<< HEAD\n",'')
-                    editor_text=editor_text.replace(">>>>>>>",'')
-                    editor_texts = editor_text.split("=======\n")
-                    default_text = editor_texts[0].trim()
-                    modtext = editor_texts[1].trim()
-                } else {
-                    modtext = default_text
-                }
-                method = "old"
-            }
-            console.log(method)
-            oldEditor.dispose()
-            clearEditors()
-            var originalModel = monaco.editor.createModel(default_text, userLanguage);
-            var modifiedModel = monaco.editor.createModel(modtext, userLanguage);
-            var diffEditor = monaco.editor.createDiffEditor(document.getElementById("container"), {
-                originalEditable: true, // for left pane
-                readOnly: false, // for right pane
-            });
-            diffEditor.setModel({ original: originalModel, modified: modifiedModel });
-            diffEditor.updateOptions({ wordWrap: userWrap });
-        }
-
-
-        const pickerOpts = {
-            types: [
-                {
-                    description: "Text",
-                    accept: {
-                        "text/*": [".txt", ".csv", ".log"]
-                    }
-                },
-            ],
-            excludeAcceptAllOption: true,
-            multiple: false
-        };
-
-        async function openFile() { // Open file picker and destructure the result the first handle
-            const [fileHandle] = await window.showOpenFilePicker(pickerOpts);
-
-            // get file contents
-            const fileData = await fileHandle.getFile();
-            const fileText = await fileData.text();
-            setEditors(fileText);
-        }
-
-        async function saveFile() { // create a new handle
-            const opts = {
-                types: [
-                    {
-                        description: "Text file",
-                        accept: { "text/plain": [".txt"] },
-                    },
-                ],
-            };
-            const newHandle = await window.showSaveFilePicker(opts);
-
-            // create a FileSystemWritableFileStream to write to
-            const writableStream = await newHandle.createWritable();
-
-            // write our file
-            await writableStream.write(getEditors());
-
-            // close the file and write the contents to disk.
-            await writableStream.close();
-        }
+      // Service Worker Registration
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("sw.js", { scope: "/codepad/" });
+      }
     </script>
-    <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js', { scope: '/codepad/' });
-        }
-    </script>
-</body>
-
+  </body>
 </html>

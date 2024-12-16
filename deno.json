@@ -1,0 +1,5 @@
+{
+  "imports": {
+    "monaco-editor": "npm:monaco-editor"
+  }
+}
