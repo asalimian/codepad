@@ -14,18 +14,18 @@ class EditorManager {
 
   async initMonaco() {
     require.config({
-      paths: { vs: "monaco-editor/min/vs/" },
+      paths: { vs: "monaco-editor/min/vs" },
     });
 
     await require(["vs/editor/editor.main"], () => {
-      this.createEditor();
+      this.createEditor(true);
     });
   }
 
-  createEditor() {
+  createEditor(init=false) {
     this.clearEditors();
     this.currentEditor = monaco.editor.create(this.container, {
-      value: CONFIG.defaultText,
+      value: init ? CONFIG.defaultText : "",
       language: this.settings.language,
       wordWrap: this.settings.wordWrap,
     });
