@@ -2,5 +2,4 @@
 node_modules/.deno/*
 node_modules/monaco-editor/dev/*
 node_modules/monaco-editor/esm/*
-node_modules/monaco-editor/min-maps/*
 deno.lock
