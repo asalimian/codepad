@@ -95,7 +95,7 @@ select {
   height: 0;
 }
 
-.slider {
+.toggle {
   position: absolute;
   cursor: pointer;
   top: 0;
@@ -107,7 +107,7 @@ select {
   border-radius: 28px;
 }
 
-.slider:before {
+.toggle:before {
   position: absolute;
   content: "";
   height: 20px;
@@ -119,11 +119,11 @@ select {
   border-radius: 50%;
 }
 
-input:checked + .slider {
+input:checked + .toggle {
   background-color: var(--switch-active);
 }
 
-input:checked + .slider:before {
+input:checked + .toggle:before {
   transform: translateX(24px);
 }
 

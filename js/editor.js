@@ -14,7 +14,7 @@ class EditorManager {
 
   async initMonaco() {
     require.config({
-      paths: { vs: "monaco-editor/min/vs" },
+      paths: { vs: "node_modules/monaco-editor/min/vs" },
     });
 
     await require(["vs/editor/editor.main"], () => {
