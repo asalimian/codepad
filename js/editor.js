@@ -14,7 +14,7 @@ class EditorManager {
 
   async initMonaco() {
     require.config({
-      paths: { vs: "/codepad/node_modules/monaco-editor/min/vs" },
+      paths: { vs: "https://unpkg.com/monaco-editor@latest/min/vs" },
     });
 
     await require(["vs/editor/editor.main"], () => {
