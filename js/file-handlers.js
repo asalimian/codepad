@@ -1,5 +1,5 @@
 // file-handlers.js - File operations
-// file-handlers.js
+
 class FileHandler {
   constructor(editorManager) {
     this.editorManager = editorManager;
@@ -88,12 +88,51 @@ class FileHandler {
 
   async openFile() {
     try {
-      const [fileHandle] = await window.showOpenFilePicker(
-        CONFIG.filePickerOptions,
-      );
-      const fileData = await fileHandle.getFile();
-      const fileText = await fileData.text();
-      this.editorManager.setContent(fileText);
+      // Try File System Access API first
+      if ('showOpenFilePicker' in window) {
+        const [fileHandle] = await window.showOpenFilePicker(
+          CONFIG.filePickerOptions,
+        );
+        const fileData = await fileHandle.getFile();
+        const fileText = await fileData.text();
+        this.editorManager.setContent(fileText);
+      } else {
+        // Fallback for other browsers
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'text/*,.txt,.md,.js,.py,.html,.css,.json,.log,.csv';
+
+        input.onchange = async (e) => {
+          const file = e.target.files[0];
+          if (file) {
+            const fileText = await file.text();
+            this.editorManager.setContent(fileText);
+
+            // Try to set appropriate language mode based on file extension
+            const extension = file.name.split(".").pop().toLowerCase();
+            const languageMap = {
+              "js": "javascript",
+              "py": "python",
+              "html": "html",
+              "css": "css",
+              "json": "json",
+              "md": "markdown",
+              "txt": "text",
+            };
+
+            if (languageMap[extension]) {
+              this.editorManager.updateLanguage(languageMap[extension]);
+              // Update the language selector in UI
+              const syntaxSelect = document.getElementById("syntax");
+              if (syntaxSelect) {
+                syntaxSelect.value = languageMap[extension];
+              }
+            }
+          }
+        };
+
+        input.click();
+      }
     } catch (error) {
       console.error("Error opening file:", error);
     }
@@ -101,16 +140,29 @@ class FileHandler {
 
   async saveFile() {
     try {
-      const newHandle = await window.showSaveFilePicker(CONFIG.fileSaveOptions);
-      const writableStream = await newHandle.createWritable();
-
       const content = this.editorManager.getCurrentContent();
       const textToSave = typeof content === "string"
         ? content
         : content.modified;
 
-      await writableStream.write(textToSave);
-      await writableStream.close();
+      // Try File System Access API first 
+      if ('showSaveFilePicker' in window) {
+        const newHandle = await window.showSaveFilePicker(CONFIG.fileSaveOptions);
+        const writableStream = await newHandle.createWritable();
+        await writableStream.write(textToSave);
+        await writableStream.close();
+      } else {
+        // Fallback for other browsers
+        const blob = new Blob([textToSave], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'document.txt';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
     } catch (error) {
       console.error("Error saving file:", error);
     }
